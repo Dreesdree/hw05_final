@@ -9,4 +9,4 @@ class ViewTestClass(TestCase):
 
     def test_templ_error_page(self):
         response = self.client.get('/nonexist-page/')
-        self.assertTemplateUsed(response, ('core/404.html') )
+        self.assertTemplateUsed(response, 'core/404.html')
