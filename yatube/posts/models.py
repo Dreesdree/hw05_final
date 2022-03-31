@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class Group(models.Model):
     title = models.CharField(
         max_length=200,
@@ -89,8 +90,10 @@ class Comment(models.Model):
         auto_now_add=True,
         verbose_name='Дата создания коментария'
     )
+
+
 class Follow(models.Model):
-    user =models.ForeignKey(
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         blank=True,

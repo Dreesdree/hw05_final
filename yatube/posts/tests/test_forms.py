@@ -9,12 +9,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 
 from posts.models import Group, Post, Comment
-from posts.forms import PostForm, CommentForm
+from posts.forms import PostForm
 
 User = get_user_model()
 
-TEST_CACHE_SETTING = {'default' : {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'},}
+TEST_CACHE_SETTING = {
+    'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'},
+}
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostFormTest(TestCase):
@@ -66,7 +69,7 @@ class PostFormTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:profile',
             kwargs={'username': f'{self.user}'})
-        )
+                             )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(
@@ -139,7 +142,7 @@ class PostFormTest(TestCase):
         )
         self.assertTrue(
             Post.objects.filter(
-                text= 'Тестовый текст',
+                text='Тестовый текст',
                 image='posts/small.gif'
             ).exists()
         )
