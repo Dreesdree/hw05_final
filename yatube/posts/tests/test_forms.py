@@ -3,13 +3,11 @@ import tempfile
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
-from django.core.cache import cache
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 
 from posts.models import Group, Post, Comment
-from posts.forms import PostForm
 
 User = get_user_model()
 
@@ -56,7 +54,7 @@ class PostFormTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:profile',
             kwargs={'username': f'{self.user}'})
-        )
+                             )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(
@@ -138,6 +136,7 @@ class PostFormTest(TestCase):
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
 
+
 class CommentFormTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -172,4 +171,3 @@ class CommentFormTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comment_count + 1)
-

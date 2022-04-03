@@ -12,6 +12,7 @@ TEST_CACHE_SETTING = {
     'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'},
 }
 
+
 class PostPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -166,7 +167,7 @@ class PostPagesTests(TestCase):
             'posts:profile_follow', kwargs={'username': self.other_user}))
         self.assertTrue(Follow.objects.filter(
             user=self.user, author=self.other_user).exists()
-        )
+                        )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
     def test_unfollow_for_auth(self):
@@ -180,7 +181,7 @@ class PostPagesTests(TestCase):
             'posts:profile_unfollow', kwargs={'username': self.other_user}))
         self.assertFalse(Follow.objects.filter(
             user=self.user, author=self.other_user).exists()
-        )
+                         )
         self.assertEqual(Follow.objects.count(), follow_count - 1)
 
     @override_settings(CACHES=TEST_CACHE_SETTING)
