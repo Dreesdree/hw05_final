@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -19,6 +20,10 @@ class Group(models.Model):
         verbose_name='Описание группы',
         help_text='Подробнее'
     )
+
+    class Meta:
+        verbose_name = 'Группа'
+        verbose_name_plural = 'Группы'
 
     def __str__(self):
         return self.title
@@ -57,6 +62,8 @@ class Post(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
+        verbose_name = 'Пост'
+        verbose_name_plural = "Посты"
 
     def __str__(self):
         return self.text[:15]
@@ -91,6 +98,13 @@ class Comment(models.Model):
         verbose_name='Дата создания коментария'
     )
 
+    class Meta:
+        verbose_name = 'Коментарий'
+        verbose_name_plural = 'Коментарии'
+
+    def __str__(self):
+        return self.text
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
@@ -109,3 +123,14 @@ class Follow(models.Model):
         null=True,
         verbose_name='Имя автора',
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='unique appversion')
+        ]
+        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписчики'
+
+    def __str__(self):
+        return f"{self.user} подписан на {self.author}"

@@ -3,7 +3,7 @@ from http import HTTPStatus
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from posts.models import Group, Post
+from posts.models import Group, Post, Comment, Follow
 
 User = get_user_model()
 
@@ -21,6 +21,10 @@ class PostURLTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовая пост',
+        )
+        cls.comment = Comment.objects.create(
+            author=cls.user,
+            text='Тестовый коментарий'
         )
 
     def setUp(self):
@@ -64,6 +68,36 @@ class PostURLTests(TestCase):
         response = self.guest_client.get('/unexisting/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
+    def test_comment_url_exists_at_desired_location(self):
+        '''Страница с коментариями'''
+        response = self.guest_client.get('/posts/1/comment')
+        self.assertEqual(response.status_code, HTTPStatus.MOVED_PERMANENTLY)
+
+    def test_follow_url_exists_at_desired_location(self):
+        """Страница с подписчиками"""
+        response = self.guest_client.get('/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_profile_url_exists_at_desired_location(self):
+        """Страница /profile/follow доступна любому пользователю."""
+        response = self.guest_client.get('/profile/Имя/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_profile_url_exists_at_desired_location_author(self):
+        """Страница /profile/follow доступна автору"""
+        response = self.authorized_client.get('/profile/Имя/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.MOVED_PERMANENTLY)
+
+    def test_profile_url_exists_at_desired_location(self):
+        """Страница /profile/unfollow доступна любому пользователю."""
+        response = self.guest_client.get('/profile/Имя/unfollow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_profile_url_exists_at_desired_location_author(self):
+        """Страница /profile/unfollow доступна автору"""
+        response = self.authorized_client.get('/profile/Имя/unfollow/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_url_names = {
@@ -73,6 +107,7 @@ class PostURLTests(TestCase):
             '/posts/1/': 'posts/post_detail.html',
             '/posts/1/edit/': 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):

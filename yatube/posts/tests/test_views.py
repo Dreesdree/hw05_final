@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 from django.core.cache import cache
@@ -8,6 +8,9 @@ from posts.models import Group, Post, Follow
 
 User = get_user_model()
 
+TEST_CACHE_SETTING = {
+    'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'},
+}
 
 class PostPagesTests(TestCase):
     @classmethod
@@ -179,6 +182,24 @@ class PostPagesTests(TestCase):
             user=self.user, author=self.other_user).exists()
         )
         self.assertEqual(Follow.objects.count(), follow_count - 1)
+
+    @override_settings(CACHES=TEST_CACHE_SETTING)
+    def test_cache_index(self):
+        """Проверяем, кэш главной страницы"""
+        posts_count = Post.objects.count()
+        response = self.authorized_client.get('posts:index').content
+        Post.objects.create(
+            author=self.user,
+            text='Тестовый текст ',
+            group=self.group
+        )
+        self.assertEqual(Post.objects.count(), posts_count + 1)
+
+        self.assertEqual(response, (
+            self.authorized_client.get('posts:index').content))
+        cache.clear()
+        self.assertEqual(response, (
+            self.authorized_client.get('posts:index').content))
 
 
 class PaginatorViewsTest(TestCase):

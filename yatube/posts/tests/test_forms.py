@@ -25,23 +25,10 @@ class PostFormTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='Имя')
-
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test_slug',
             description='Тестовое описание',
-        )
-
-        cls.post = Post.objects.create(
-            text='Тестовый текст',
-            author=cls.user
-        )
-
-        cls.form = PostForm()
-
-        cls.comment = Comment.objects.create(
-            author=cls.user,
-            text='Тестовый коментарий'
         )
 
     def setUp(self):
@@ -151,6 +138,25 @@ class PostFormTest(TestCase):
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
 
+class CommentFormTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='Имя')
+        cls.comment = Comment.objects.create(
+            author=cls.user,
+            text='Тестовый коментарий'
+        )
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=cls.user
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
     def test_create_comment(self):
         """Авторизованный пользователь создает комментарий к посту."""
         comment_count = Comment.objects.count()
@@ -167,20 +173,3 @@ class PostFormTest(TestCase):
             'posts:post_detail', kwargs={'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comment_count + 1)
 
-    @override_settings(CACHES=TEST_CACHE_SETTING)
-    def test_cache_index(self):
-        """Проверяем, кэш главной страницы"""
-        posts_count = Post.objects.count()
-        response = self.authorized_client.get('posts:index').content
-        Post.objects.create(
-            author=self.user,
-            text='Тестовый текст ',
-            group=self.group
-        )
-        self.assertEqual(Post.objects.count(), posts_count + 1)
-
-        self.assertEqual(response, (
-            self.authorized_client.get('posts:index').content))
-        cache.clear()
-        self.assertEqual(response, (
-            self.authorized_client.get('posts:index').content))
