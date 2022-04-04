@@ -54,7 +54,7 @@ class PostFormTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:profile',
             kwargs={'username': f'{self.user}'})
-        )
+                             )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(
@@ -175,4 +175,4 @@ class CommentFormTest(TestCase):
             Comment.objects.filter(
                 text='Тестовый коментарий',
                 author=self.user.id
-        ).exists())
+            ).exists())

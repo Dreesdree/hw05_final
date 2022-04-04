@@ -256,4 +256,7 @@ class PaginatorViewsTest(TestCase):
         for url_name in url_paginator_test:
             with self.subTest(url_name=url_name):
                 response = self.authorized_client.get(url_name)
-                self.assertEqual(len(response.context['page_obj']), len(['page_obj'])+2)
+                self.assertEqual(
+                    len(response.context['page_obj']),
+                    len(['page_obj']) + 2,
+                )
