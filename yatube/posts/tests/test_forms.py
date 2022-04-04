@@ -171,3 +171,8 @@ class CommentFormTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertTrue(
+            Comment.objects.filter(
+                text='Тестовый коментарий',
+                author=self.user.id
+        ).exists())

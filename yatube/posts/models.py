@@ -102,7 +102,7 @@ class Comment(models.Model):
         verbose_name_plural = 'Коментарии'
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Follow(models.Model):
@@ -124,12 +124,12 @@ class Follow(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'author'],
+        constraints = (
+            models.UniqueConstraint(fields=('user', 'author',),
                                     name='unique appversion')
-        ]
+        )
         verbose_name = 'Подписчик'
         verbose_name_plural = 'Подписчики'
 
     def __str__(self):
-        return f"{self.user} подписан на {self.author}"
+        return f'{self.user} подписан на {self.author}'

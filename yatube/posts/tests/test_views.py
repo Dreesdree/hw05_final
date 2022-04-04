@@ -3,6 +3,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 from django.core.cache import cache
+from yatube.settings import PAGE
 
 from posts.models import Group, Post, Follow
 
@@ -239,7 +240,7 @@ class PaginatorViewsTest(TestCase):
         for url_name in url_paginator_test:
             with self.subTest(url_name=url_name):
                 response = self.authorized_client.get(url_name)
-                self.assertEqual(len(response.context['page_obj']), 10)
+                self.assertEqual(len(response.context['page_obj']), PAGE)
 
     def test_second_page_contains_three_records(self):
         """На второй оставшиеся 3 поста"""
@@ -255,4 +256,4 @@ class PaginatorViewsTest(TestCase):
         for url_name in url_paginator_test:
             with self.subTest(url_name=url_name):
                 response = self.authorized_client.get(url_name)
-                self.assertEqual(len(response.context['page_obj']), 3)
+                self.assertEqual(len(response.context['page_obj']), len(['page_obj'])+2)
